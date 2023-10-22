@@ -1,17 +1,18 @@
 
 variable "AWS_REGION" {
-	default = "us-east-1"
+	default = "ap-southeast-2"
 }
 
-# If you are using diffrent region (other than us-east-1) please find ubuntu 18.04 ami for that region and change here.
+# If you are using diffrent region (other than ap-southeast-2) please find ubuntu 18.04 ami for that region and change here.
 variable "ami_id" {
     type = string
-    default = "ami-0d73480446600f555"
+    # default = "ami-001dbdb48850e6f54" # Ubuntu 10.04
+	default = "ami-08939177c401ce8f9" # ubuntu 20.04
 }
 
 variable "availability_zones" {
   type    = list(string)
-  default = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  default = ["ap-southeast-2a", "ap-southeast-2b", "ap-southeast-2c"]
 }
 
 variable "vpc_cidr" {
@@ -31,12 +32,12 @@ variable "public_subnets" {
 
 variable "master_node_count" {
     type = number
-    default = 3
+    default = 2
 }
 
 variable "worker_node_count" {
     type = number
-    default = 3
+    default = 2
 }
 
 variable "ssh_user" {
@@ -46,10 +47,10 @@ variable "ssh_user" {
 
 variable "master_instance_type" {
     type = string
-    default = "t3.small"
+    default = "t3.medium"
 }
 
 variable "worker_instance_type" {
     type = string
-    default = "t3.micro"
+    default = "t3.medium"
 }

@@ -138,7 +138,9 @@
 
    - name: Install Pod network
      become_user: ubuntu
-     shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml >> pod_setup.txt
+     #shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml >> pod_setup.txt
+     # good shell: kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml >> pod_setup.txt
+     shell: kubectl apply -f https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/calico.yaml >> pod_setup.txt
      args:
        chdir: $HOME
        creates: pod_setup.txt
