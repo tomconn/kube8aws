@@ -3,10 +3,9 @@ variable "AWS_REGION" {
 	default = "ap-southeast-2"
 }
 
-# If you are using diffrent region (other than ap-southeast-2) please find ubuntu 18.04 ami for that region and change here.
+# If you are using diffrent region (other than ap-southeast-2) please find ubuntu 20.04 ami for that region and change here.
 variable "ami_id" {
     type = string
-    # default = "ami-001dbdb48850e6f54" # Ubuntu 10.04
 	default = "ami-08939177c401ce8f9" # ubuntu 20.04
 }
 
@@ -32,7 +31,7 @@ variable "public_subnets" {
 
 variable "master_node_count" {
     type = number
-    default = 2
+    default = 1
 }
 
 variable "worker_node_count" {
