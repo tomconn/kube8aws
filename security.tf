@@ -113,7 +113,7 @@ resource "aws_security_group" "k8_workers" {
     }
 
     ingress {
-        #NodePort Services†
+        #NodePort Services
         from_port   = 30000
         to_port     = 32767
         protocol    = "tcp"

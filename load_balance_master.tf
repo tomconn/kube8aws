@@ -42,6 +42,7 @@ resource "aws_lb_listener" "k8_masters_lb_listener" {
     }
 }
 
+# attach the master ec2 instances to the target group 
 resource "aws_lb_target_group_attachment" "k8_masters_attachment" {
     count = length(aws_instance.masters.*.id)
     target_group_arn = aws_lb_target_group.k8_masters_api.arn

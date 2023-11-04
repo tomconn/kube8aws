@@ -177,6 +177,18 @@
 
    - name: Copy worker node join command to local file
      local_action: copy content="{{ join_node_command.stdout_lines[0] }}" dest="./join_node_command"
+     
+   - name: Add alias k=kubectl
+     lineinfile:
+       path=/home/ubuntu/.bashrc
+       line="alias k=kubectl"
+       insertafter=EOF
+
+   - name: Source .bashrc
+     shell: "source /home/ubuntu/.bashrc"
+     args:
+       executable: /bin/bash
+       
 ###
 
 #### Configure other master nodes
@@ -189,7 +201,7 @@
        name: kubectl
        state: present
        force: yes
-
+       
    - name: Copy the master join command to server location
      copy: src=join_command dest=/tmp/join_command.sh mode=0777
 
