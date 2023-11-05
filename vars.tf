@@ -1,12 +1,11 @@
-
 variable "AWS_REGION" {
-	default = "ap-southeast-2"
+    default = "ap-southeast-2"
 }
 
 # If you are using diffrent region (other than ap-southeast-2) please find ubuntu 20.04 ami for that region and change here.
 variable "ami_id" {
     type = string
-	default = "ami-08939177c401ce8f9" # ubuntu 20.04
+    default = "ami-08939177c401ce8f9" # ubuntu 20.04
 }
 
 variable "availability_zones" {
