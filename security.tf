@@ -49,7 +49,21 @@ resource "aws_security_group" "k8_nondes" {
         protocol    = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
-  
+
+    # nginx ingress controller problem
+    # https://github.com/kubernetes/ingress-nginx/issues/5401
+    ingress {
+        from_port   = 8443
+        to_port     = 8443
+        protocol    = "tcp"
+        cidr_blocks = ["${var.vpc_cidr}"]
+    }
+    egress {
+        from_port   = 8443
+        to_port     = 8443
+        protocol    = "tcp"
+        cidr_blocks = ["${var.vpc_cidr}"]
+    }
 }
 
 resource "aws_security_group" "k8_masters" {
@@ -119,4 +133,68 @@ resource "aws_security_group" "k8_workers" {
         protocol    = "tcp"
         cidr_blocks = ["${var.vpc_cidr}"]
     }
+	
+    ingress {
+        #NodePort Services
+        from_port   = 30000
+        to_port     = 32767
+        protocol    = "tcp"
+        security_groups = [aws_security_group.k8_alb_workers.id]
+    }
+
+    ingress {
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_blocks = ["${var.vpc_cidr}"]
+    }
+	
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["${var.vpc_cidr}"]
+    }
 }
+
+# TC add a sg to the alb
+resource "aws_security_group" "k8_alb_workers" {
+    name = "k8_alb_workers"
+    description = "sec group for k8 alb to worker nodes"
+    vpc_id = module.vpc.vpc_id
+
+	# requests from the internet (NodePort)
+	ingress {
+		from_port   = 30000
+		to_port     = 32767
+		protocol    = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+	
+	ingress {
+		from_port   = 80
+		to_port     = 80
+		protocol    = "tcp"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+
+    # calls to EC2 NodePort
+#    egress {
+#        from_port   = 30000
+#        to_port     = 32767
+#        protocol    = "tcp"
+#        cidr_blocks = ["${var.vpc_cidr}"]
+#    }
+	
+	# outbound internet access
+	egress {
+		from_port   = 0
+		to_port     = 0
+		protocol    = "-1"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+
+}
+
+
+

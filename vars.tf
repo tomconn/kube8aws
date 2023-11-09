@@ -35,7 +35,12 @@ variable "master_node_count" {
 
 variable "worker_node_count" {
     type = number
-    default = 2
+    default = 1
+}
+
+variable "webserver_node_count" {
+    type = number
+    default = 1
 }
 
 variable "ssh_user" {
@@ -49,6 +54,11 @@ variable "master_instance_type" {
 }
 
 variable "worker_instance_type" {
+    type = string
+    default = "t3.medium"
+}
+
+variable "webserver_instance_type" {
     type = string
     default = "t3.medium"
 }
