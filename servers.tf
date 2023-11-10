@@ -54,6 +54,12 @@ resource "aws_instance" "workers" {
   }
 }
 
+# wating for webserver user data init.
+# TODO: Need to switch to signaling based solution instead of waiting. 
+resource "time_sleep" "wait_for_webserver_init" {
+  create_duration = "120s"
+}
+
 #webserver
 resource "aws_instance" "webserver" {
   count         = var.webserver_node_count
@@ -64,11 +70,14 @@ resource "aws_instance" "webserver" {
   security_groups = [aws_security_group.k8_nondes.id, aws_security_group.k8_workers.id]
   user_data = <<-EOF
                 #!bin/bash
-                apt-get update -y
-                apt-get install nginx -y
-                systemctl enable nginx
-                systemctl start nginx
+                sudo apt-get update -y
+                sudo apt-get install nginx -y
+                sudo systemctl enable nginx
+                sudo systemctl start nginx
                 EOF
+#   user_data = "${file("install_nginx.sh")}"
+
+  depends_on        = [time_sleep.wait_for_webserver_init]
 
   tags = {
     Name = format("webserver-%02d", count.index + 1)
