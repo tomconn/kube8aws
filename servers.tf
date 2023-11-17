@@ -56,30 +56,27 @@ resource "aws_instance" "workers" {
 
 # wating for webserver user data init.
 # TODO: Need to switch to signaling based solution instead of waiting. 
-resource "time_sleep" "wait_for_webserver_init" {
-  create_duration = "120s"
-}
+# resource "time_sleep" "wait_for_webserver_init" {
+#   create_duration = "120s"
+# }
 
-#webserver
-resource "aws_instance" "webserver" {
-  count         = var.webserver_node_count
-  ami           = var.ami_id
-  instance_type = var.webserver_instance_type
-  subnet_id = "${element(module.vpc.private_subnets, count.index)}"
-  key_name          =   aws_key_pair.k8_ssh.key_name
-  security_groups = [aws_security_group.k8_nondes.id, aws_security_group.k8_workers.id]
-  user_data = <<-EOF
-                #!bin/bash
-                sudo apt-get update -y
-                sudo apt-get install nginx -y
-                sudo systemctl enable nginx
-                sudo systemctl start nginx
-                EOF
-#   user_data = "${file("install_nginx.sh")}"
-
-  depends_on        = [time_sleep.wait_for_webserver_init]
-
-  tags = {
-    Name = format("webserver-%02d", count.index + 1)
-  }
-}
+#webserver - for testing ec2 in the private subnet
+# resource "aws_instance" "webserver" {
+#   count         = var.webserver_node_count
+#   ami           = var.ami_id
+#   instance_type = var.webserver_instance_type
+#   subnet_id = "${element(module.vpc.private_subnets, count.index)}"
+#   key_name          =   aws_key_pair.k8_ssh.key_name
+#   security_groups = [aws_security_group.k8_nondes.id, aws_security_group.k8_workers.id]
+#   user_data = <<-EOF
+#                 #!bin/bash
+#                 sudo apt-get update -y
+#                 sudo apt-get install nginx -y
+#                 sudo systemctl enable nginx
+#                 sudo systemctl start nginx
+#                 EOF
+#   depends_on        = [time_sleep.wait_for_webserver_init]
+#   tags = {
+#     Name = format("webserver-%02d", count.index + 1)
+#   }
+#}
