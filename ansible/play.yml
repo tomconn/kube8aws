@@ -138,9 +138,7 @@
 
    - name: Install Pod network
      become_user: ubuntu
-     #shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml >> pod_setup.txt
-     # good shell: kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml >> pod_setup.txt
-     shell: kubectl apply -f https://raw.githubusercontent.com/killer-sh/cks-course-environment/master/cluster-setup/calico.yaml >> pod_setup.txt
+     shell: kubectl apply -f https://raw.githubusercontent.com/tomconn/cks-course-environment/master/cluster-setup/calico.yaml >> pod_setup.txt
      args:
        chdir: $HOME
        creates: pod_setup.txt
@@ -188,7 +186,16 @@
      shell: "source /home/ubuntu/.bashrc"
      args:
        executable: /bin/bash
-       
+
+   - name: Install custom nginx ingress controller
+     become_user: ubuntu
+     shell: kubectl apply -f https://raw.githubusercontent.com/tomconn/cks-course-environment/master/cluster-extensions/ingress-controller.yaml >> ing_controller_setup.txt
+
+   - name: Install 'It Works!'
+     become_user: ubuntu
+     shell: kubectl apply -f https://raw.githubusercontent.com/tomconn/cks-course-environment/master/cluster-extensions/example.yaml >> example.txt
+
+
 ###
 
 #### Configure other master nodes

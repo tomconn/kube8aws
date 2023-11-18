@@ -38,11 +38,6 @@ variable "worker_node_count" {
     default = 1
 }
 
-variable "webserver_node_count" {
-    type = number
-    default = 1
-}
-
 variable "ssh_user" {
     type = string
     default = "ubuntu"
@@ -56,9 +51,4 @@ variable "master_instance_type" {
 variable "worker_instance_type" {
     type = string
     default = "t3.medium"
-}
-
-variable "webserver_instance_type" {
-    type = string
-    default = "t3.micro"
 }
