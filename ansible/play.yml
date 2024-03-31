@@ -1,5 +1,10 @@
 ---
 - hosts: all
+  vars:
+    k8s_url_apt_key: "https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key"
+    k8s_gpgpath: /usr/share/keyrings/kubernetes-apt-keyring.gpg
+    k8s_repository: "https://pkgs.k8s.io/core:/stable:/v1.28/deb/"
+
   become: yes
   tasks:
    - name: Docker Installation
@@ -13,16 +18,16 @@
        name: apt-transport-https
        state: present
 
-   - name: Add Kubernetes apt-key for APT repository
-     apt_key:
-       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-       state: present
+# see updated k8s.io repo https://medium.com/@martin.hodges/installing-kubernetes-from-the-new-k8s-io-repository-using-ansible-8e7319fa97fd
+   - name: Get Kubernetes package key
+     shell: curl -fsSL {{ k8s_url_apt_key }} | gpg --dearmor -o {{ k8s_gpgpath }}
+     args:
+       creates: "{{ k8s_gpgpath }}"
 
-   - name: Add Kubernetes APT repository
+   - name: Install Kubernetes repository
      apt_repository:
-      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-      state: present
-      filename: 'kubernetes'
+       filename: kubernetes
+       repo: "deb [signed-by={{ k8s_gpgpath }}] {{ k8s_repository }} /"
 
    - name: Kubelet Install
      apt:
