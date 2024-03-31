@@ -1,11 +1,11 @@
 #Bastion
 resource "aws_instance" "bastion" {
-  ami           = var.ami_id
-  instance_type = "t3.micro"
-  subnet_id = module.vpc.public_subnets[0]
+  ami                         = var.ami_id
+  instance_type               = "t3.micro"
+  subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = "true"
-  security_groups = [aws_security_group.allow_ssh.id]
-  key_name          =   aws_key_pair.k8_ssh.key_name
+  security_groups             = [aws_security_group.allow_ssh.id]
+  key_name                    = aws_key_pair.k8_ssh.key_name
   ##https://github.com/hashicorp/terraform/issues/30134
   user_data = <<-EOF
                 #!bin/bash
@@ -28,11 +28,11 @@ resource "aws_instance" "bastion" {
 
 #Master
 resource "aws_instance" "masters" {
-  count         = var.master_node_count
-  ami           = var.ami_id
-  instance_type = var.master_instance_type
-  subnet_id = "${element(module.vpc.private_subnets, count.index)}"
-  key_name          =   aws_key_pair.k8_ssh.key_name
+  count           = var.master_node_count
+  ami             = var.ami_id
+  instance_type   = var.master_instance_type
+  subnet_id       = element(module.vpc.private_subnets, count.index)
+  key_name        = aws_key_pair.k8_ssh.key_name
   security_groups = [aws_security_group.k8_nondes.id, aws_security_group.k8_masters.id]
 
   tags = {
@@ -42,11 +42,11 @@ resource "aws_instance" "masters" {
 
 #Worker
 resource "aws_instance" "workers" {
-  count         = var.worker_node_count
-  ami           = var.ami_id
-  instance_type = var.worker_instance_type
-  subnet_id = "${element(module.vpc.private_subnets, count.index)}"
-  key_name          =   aws_key_pair.k8_ssh.key_name
+  count           = var.worker_node_count
+  ami             = var.ami_id
+  instance_type   = var.worker_instance_type
+  subnet_id       = element(module.vpc.private_subnets, count.index)
+  key_name        = aws_key_pair.k8_ssh.key_name
   security_groups = [aws_security_group.k8_nondes.id, aws_security_group.k8_workers.id]
 
   tags = {
