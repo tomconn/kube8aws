@@ -3,7 +3,7 @@
   vars:
     k8s_url_apt_key: "https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key"
     k8s_gpgpath: /usr/share/keyrings/kubernetes-apt-keyring.gpg
-    k8s_repository: "https://pkgs.k8s.io/core:/stable:/v1.28/deb/"
+    k8s_repository: "https://pkgs.k8s.io/core:/stable:/v1.29/deb/"
 
   become: yes
   tasks:
@@ -110,7 +110,7 @@
        force: yes
 
    - name: Start the cluster
-     shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket /run/cri-dockerd.sock --control-plane-endpoint "{{ master_lb }}":6443 --upload-certs >> cluster.txt
+     shell: kubeadm init --pod-network-cidr=10.244.0.0/16 --cri-socket /run/cri-dockerd.sock --control-plane-endpoint "{{ master_lb }}":6443 --upload-certs >> cluster.txt
      register: result
      args:
       chdir: $HOME
@@ -141,13 +141,6 @@
        owner: ubuntu
      when: k8s_conf.stat.exists
 
-   - name: Install Pod network
-     become_user: ubuntu
-     shell: kubectl apply -f https://raw.githubusercontent.com/tomconn/cks-course-environment/master/cluster-setup/calico.yaml >> pod_setup.txt
-     args:
-       chdir: $HOME
-       creates: pod_setup.txt
-
    - name: get default kubeadm config
      shell: kubeadm config print init-defaults > kubeadm_config.yaml
      args:
@@ -163,6 +156,28 @@
    - name: Create a new certificate key
      shell: kubeadm init phase upload-certs --upload-certs --config $HOME/kubeadm_config.yaml
      register: join_certificate_key
+
+   - name: Create directory - /var/run/calico
+     ansible.builtin.file:
+        path: /var/run/calico
+        state: directory
+
+   - name: Create directory - /var/lib/calico
+     ansible.builtin.file:
+        path: /var/lib/calico
+        state: directory
+
+   - name: Create directory - /var/lib/cni/networks
+     ansible.builtin.file:
+        path: /var/lib/cni/networks
+        state: directory
+
+   - name: Install Pod network
+     become_user: ubuntu
+     shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml >> pod_setup.txt
+     args:
+       chdir: $HOME
+       creates: pod_setup.txt
 
    - name: Get join command
      shell: kubeadm token create --print-join-command --certificate-key "{{ join_certificate_key.stdout_lines[2] }}"
